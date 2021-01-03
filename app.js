@@ -37,6 +37,7 @@ UI.prototype.showAlert = function (message, className) {
   div.className = `alert ${className}`;
   // Create text node and append the div
   div.appendChild(document.createTextNode(message));
+  console.log(message);
   // Get parent
   const container = document.querySelector('.container');
   const form = document.querySelector('#book-form');
@@ -47,7 +48,14 @@ UI.prototype.showAlert = function (message, className) {
     document.querySelector('.alert').remove();
   }, 3000);
 };
+// Delete Book
+UI.prototype.deleteBook = function (target) {
+  if (target.className === 'delete') {
+    target.parentElement.parentElement.remove();
+  }
+};
 // Event Listeners
+// Event listener for adding books
 document.getElementById('book-form').addEventListener('submit', function (e) {
   // Get form values
   const title = document.querySelector('#title').value,
@@ -71,6 +79,21 @@ document.getElementById('book-form').addEventListener('submit', function (e) {
     // Shoe Success
     ui.showAlert('The Book is added to the list', 'success');
   }
+
+  e.preventDefault();
+});
+// Event listener for delete
+document.querySelector('#book-list').addEventListener('click', function (e) {
+  // Instantiate UI
+  const ui = new UI();
+  // Delete the book
+  ui.deleteBook(e.target);
+
+  // get the title of a book
+  const bookTitle =
+    e.target.parentElement.parentElement.children[0].textContent;
+  // Show an alert
+  ui.showAlert(`${bookTitle} is removed from the list`, 'success');
 
   e.preventDefault();
 });
