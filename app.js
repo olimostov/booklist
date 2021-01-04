@@ -54,6 +54,51 @@ UI.prototype.deleteBook = function (target) {
     target.parentElement.parentElement.remove();
   }
 };
+// Local storage constructor
+function LocalStorage() {}
+// Get books from the Ls
+LocalStorage.getBooks = function () {
+  let books;
+  if (localStorage.getItem('books') === null) {
+    books = [];
+  } else {
+    books = JSON.parse(localStorage.getItem('books'));
+  }
+  return books;
+};
+// Display books
+LocalStorage.displayBooks = function () {
+  // Get books from LS
+  const books = LocalStorage.getBooks();
+  books.forEach((book) => {
+    // Instantiate the ui
+    const ui = new UI();
+    ui.addBookToList(book);
+  });
+};
+
+// Add Books
+LocalStorage.addBooks = function (book) {
+  const books = LocalStorage.getBooks();
+
+  books.push(book);
+  localStorage.setItem('books', JSON.stringify(books));
+};
+
+// Remove Books
+LocalStorage.removeBook = function (isbn) {
+  const books = LocalStorage.getBooks();
+
+  books.forEach((book, index) => {
+    if (book.isbn === isbn) {
+      books.splice(index, 1);
+    }
+  });
+  localStorage.setItem('books', JSON.stringify(books));
+};
+// Load event
+document.addEventListener('DOMContentLoaded', LocalStorage.displayBooks());
+
 // Event Listeners
 // Event listener for adding books
 document.getElementById('book-form').addEventListener('submit', function (e) {
@@ -67,6 +112,8 @@ document.getElementById('book-form').addEventListener('submit', function (e) {
 
   // Instantiate UI
   const ui = new UI();
+  // Instantiate LS
+  // const storage = new LocalStorage();
   // Validate
   if (title === '' || author === '' || isbn === '') {
     // Error alert
@@ -74,6 +121,8 @@ document.getElementById('book-form').addEventListener('submit', function (e) {
   } else {
     // Add book to list
     ui.addBookToList(book);
+    // Add book to the LS
+    LocalStorage.addBooks(book);
     // Clear fields
     ui.clearFields(book);
     // Shoe Success
@@ -88,10 +137,12 @@ document.querySelector('#book-list').addEventListener('click', function (e) {
   const ui = new UI();
   // Delete the book
   ui.deleteBook(e.target);
-
   // get the title of a book
   const bookTitle =
     e.target.parentElement.parentElement.children[0].textContent;
+  const bookIsbn = e.target.parentElement.previousElementSibling.textContent;
+  // Remove the book from LS
+  LocalStorage.removeBook(bookIsbn);
   // Show an alert
   ui.showAlert(`${bookTitle} is removed from the list`, 'success');
 
